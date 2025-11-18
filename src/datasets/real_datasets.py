@@ -288,14 +288,53 @@ class UKDALEDataset:
 class DatasetRegistry:
     """Registry of available NILM datasets"""
 
-    DATASETS = {
-        'redd': REDDDataset,
-        'ukdale': UKDALEDataset,
-    }
+    DATASETS = {}  # Will be populated by _register_datasets()
+
+    @classmethod
+    def _register_datasets(cls):
+        """Register all available datasets (lazy loading to avoid circular imports)"""
+        if cls.DATASETS:
+            return  # Already registered
+
+        cls.DATASETS = {
+            # Low/Medium frequency (good for disaggregation)
+            'redd': REDDDataset,
+            'ukdale': UKDALEDataset,
+        }
+
+        # Try to import other datasets (may fail if modules not available)
+        try:
+            from .refit_dataset import REFITDataset
+            cls.DATASETS['refit'] = REFITDataset
+        except ImportError:
+            pass
+
+        try:
+            from .ampds_dataset import AMPdsDataset
+            cls.DATASETS['ampds'] = AMPdsDataset
+        except ImportError:
+            pass
+
+        try:
+            from .eco_dataset import ECODataset
+            cls.DATASETS['eco'] = ECODataset
+        except ImportError:
+            pass
+
+        try:
+            from .more_datasets import GREENDDataset, PLAIDDataset, BLUEDDataset, iAWEDataset, DREDDataset
+            cls.DATASETS['greend'] = GREENDDataset
+            cls.DATASETS['plaid'] = PLAIDDataset
+            cls.DATASETS['blued'] = BLUEDDataset
+            cls.DATASETS['iawe'] = iAWEDataset
+            cls.DATASETS['dred'] = DREDDataset
+        except ImportError:
+            pass
 
     @classmethod
     def list_datasets(cls) -> List[str]:
         """List all available dataset loaders"""
+        cls._register_datasets()
         return list(cls.DATASETS.keys())
 
     @classmethod
@@ -310,6 +349,8 @@ class DatasetRegistry:
         Returns:
             Dataset loader instance
         """
+        cls._register_datasets()
+
         if name.lower() not in cls.DATASETS:
             raise ValueError(
                 f"Unknown dataset: {name}. "
@@ -321,6 +362,8 @@ class DatasetRegistry:
     @classmethod
     def check_availability(cls) -> Dict[str, bool]:
         """Check which datasets are available locally"""
+        cls._register_datasets()
+
         availability = {}
 
         for name, dataset_class in cls.DATASETS.items():
@@ -331,3 +374,96 @@ class DatasetRegistry:
                 availability[name] = False
 
         return availability
+
+    @classmethod
+    def get_dataset_info(cls) -> Dict[str, Dict]:
+        """Get information about all datasets"""
+        cls._register_datasets()
+
+        info = {
+            'redd': {
+                'name': 'REDD',
+                'homes': 6,
+                'country': 'USA',
+                'duration': '3-19 days',
+                'sampling': '15kHz / 1Hz',
+                'size': '~10GB'
+            },
+            'ukdale': {
+                'name': 'UK-DALE',
+                'homes': 5,
+                'country': 'UK',
+                'duration': '4+ years',
+                'sampling': '16kHz / 6s',
+                'size': '~800GB'
+            },
+            'refit': {
+                'name': 'REFIT',
+                'homes': 20,
+                'country': 'UK',
+                'duration': '2 years',
+                'sampling': '8s',
+                'size': '~500GB'
+            },
+            'ampds': {
+                'name': 'AMPds',
+                'homes': 1,
+                'country': 'Canada',
+                'duration': '2 years',
+                'sampling': '1 min',
+                'size': '~12GB',
+                'extra': 'Weather data'
+            },
+            'eco': {
+                'name': 'ECO',
+                'homes': 6,
+                'country': 'Switzerland',
+                'duration': '8 months',
+                'sampling': '1 Hz',
+                'size': '~3GB',
+                'extra': 'Occupancy data'
+            },
+            'greend': {
+                'name': 'GREEND',
+                'homes': 9,
+                'country': 'Italy/Austria',
+                'duration': '1 year',
+                'sampling': '1 Hz',
+                'size': '~2GB'
+            },
+            'iawe': {
+                'name': 'iAWE',
+                'homes': 1,
+                'country': 'India',
+                'duration': '73 days',
+                'sampling': '1 Hz',
+                'size': '~1GB',
+                'extra': 'Water data'
+            },
+            'dred': {
+                'name': 'DRED',
+                'homes': 1,
+                'country': 'Netherlands',
+                'duration': '6 months',
+                'sampling': '1 Hz',
+                'size': '~300MB'
+            },
+            'plaid': {
+                'name': 'PLAID',
+                'type': 'High-frequency signatures',
+                'sampling': '30 kHz',
+                'size': '~400MB',
+                'use_case': 'Appliance identification'
+            },
+            'blued': {
+                'name': 'BLUED',
+                'homes': 1,
+                'type': 'High-frequency events',
+                'duration': '8 days',
+                'sampling': '12 kHz',
+                'size': '~50GB',
+                'use_case': 'Event detection'
+            }
+        }
+
+        return info
