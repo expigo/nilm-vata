@@ -1,4 +1,4 @@
-.PHONY: help install install-dev test validate demo clean format lint
+.PHONY: help install install-dev install-dl install-all test validate demo benchmark showcase clean format lint
 
 help:  ## Show this help message
 	@echo 'Usage: make [target]'
@@ -12,8 +12,17 @@ install:  ## Install dependencies using uv
 install-dev:  ## Install development dependencies
 	uv pip install -e ".[dev]"
 
+install-dl:  ## Install deep learning dependencies (PyTorch)
+	uv pip install -e ".[deep-learning]"
+
+install-datasets:  ## Install dataset dependencies
+	uv pip install -e ".[datasets]"
+
 install-nilmtk:  ## Install optional NILMTK dependencies
 	uv pip install -e ".[nilmtk]"
+
+install-all:  ## Install all optional dependencies
+	uv pip install -e ".[all]"
 
 sync:  ## Sync dependencies with uv
 	uv pip sync
@@ -29,6 +38,9 @@ demo:  ## Run real-time demo
 
 benchmark:  ## Run algorithm benchmark comparison
 	python benchmark.py
+
+showcase:  ## Showcase all available algorithms
+	python showcase_algorithms.py
 
 clean:  ## Clean generated files
 	rm -rf *.png
