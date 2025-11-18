@@ -15,9 +15,13 @@ The framework includes:
 - Real-time disaggregation simulation
 - Comprehensive performance metrics
 - Visualization tools
+- Model persistence and management
+- Energy cost calculation
+- Streaming data processing
 
 ## Features
 
+### Core Features
 - ✅ Multiple NILM algorithms (CO, FHMM)
 - ✅ REDD-like dataset support (synthetic data generation)
 - ✅ Real-time disaggregation simulation
@@ -26,22 +30,45 @@ The framework includes:
 - ✅ Batch and streaming processing modes
 - ✅ Easy-to-use API
 
+### Advanced Features
+- ✅ **Model Persistence**: Save and load trained models
+- ✅ **Energy Cost Calculator**: Calculate costs with time-of-use pricing
+- ✅ **Benchmark Tool**: Compare algorithms with detailed reports
+- ✅ **Streaming Support**: Real-time async processing
+- ✅ **Cost Recommendations**: AI-powered energy saving suggestions
+
 ## Installation
 
 ### Requirements
 
-- Python 3.7+
-- Dependencies listed in `requirements.txt`
+- Python 3.9+
+- [uv](https://github.com/astral-sh/uv) - Fast Python package installer
 
-### Setup
+### Setup with uv (Recommended)
 
 ```bash
+# Install uv if you don't have it
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
 # Clone the repository
 git clone <repository-url>
 cd nilm-vata
 
 # Install dependencies
+uv pip install -e .
+
+# Or use make for convenience
+make install
+```
+
+### Alternative: Setup with pip
+
+```bash
+# Install from requirements.txt
 pip install -r requirements.txt
+
+# Or install as a package
+pip install -e .
 ```
 
 ## Quick Start
@@ -72,12 +99,59 @@ Run the interactive real-time simulation:
 
 ```bash
 python demo_realtime.py
+# Or with make
+make demo
 ```
 
 This provides an interactive menu to:
 1. Choose NILM algorithm (CO, FHMM, or both)
 2. Select demo type (real-time or batch)
 3. View live disaggregation with animated plots
+
+### 3. Benchmark Algorithms (NEW!)
+
+Compare multiple algorithms with comprehensive metrics:
+
+```bash
+python benchmark.py
+# Or with make
+make benchmark
+```
+
+This will:
+- Train and test multiple algorithms
+- Generate performance comparison charts
+- Calculate energy costs
+- Save trained models
+- Provide recommendations
+
+**Output files:**
+- `benchmark_report.txt` - Detailed comparison report
+- `benchmark_comparison.png` - Visual comparison charts
+- `energy_cost_breakdown.png` - Cost analysis
+- `models/*.pkl` - Saved trained models
+
+### 4. Quick Validation
+
+```bash
+python validate.py
+# Or with make
+make validate
+```
+
+## Using Make Commands
+
+The project includes a Makefile for convenience:
+
+```bash
+make help          # Show all available commands
+make install       # Install dependencies with uv
+make test          # Run test algorithms
+make demo          # Run real-time demo
+make benchmark     # Run benchmark comparison
+make validate      # Quick validation
+make clean         # Remove generated files
+```
 
 ## Project Structure
 
@@ -94,10 +168,17 @@ nilm-vata/
 │   └── utils/
 │       ├── __init__.py
 │       ├── visualization.py               # Plotting functions
-│       └── metrics.py                     # Performance metrics
+│       ├── metrics.py                     # Performance metrics
+│       ├── model_persistence.py           # Save/load models
+│       ├── energy_cost.py                 # Energy cost calculator
+│       └── streaming.py                   # Real-time streaming
 ├── test_algorithms.py                     # Simple test script
 ├── demo_realtime.py                       # Real-time demo
-├── requirements.txt                       # Python dependencies
+├── benchmark.py                           # Algorithm benchmark tool
+├── validate.py                            # Quick validation
+├── pyproject.toml                         # Project configuration
+├── requirements.txt                       # Python dependencies (legacy)
+├── Makefile                               # Convenient commands
 └── README.md                              # This file
 ```
 
@@ -156,6 +237,121 @@ plot_disaggregation(
     num_samples=1000,
     save_path='results.png'
 )
+```
+
+## Advanced Features
+
+### Model Persistence
+
+Save and load trained models for reuse:
+
+```python
+from src.utils.model_persistence import ModelManager
+
+# Initialize model manager
+model_manager = ModelManager(models_dir='./models')
+
+# Save a trained model
+model_manager.save_model(
+    model=co,
+    model_name='my_co_model',
+    algorithm_type='CO',
+    metadata={'accuracy': 0.95, 'notes': 'Trained on REDD data'}
+)
+
+# List saved models
+models = model_manager.list_models()
+for model_info in models:
+    print(f"Model: {model_info['name']}")
+    print(f"Metadata: {model_info.get('metadata', {})}")
+
+# Load a model
+loaded_model = model_manager.load_model('./models/CO_my_co_model_20250118.pkl')
+```
+
+### Energy Cost Calculation
+
+Calculate energy costs with time-of-use pricing:
+
+```python
+from src.utils.energy_cost import EnergyCostCalculator
+
+# Initialize with pricing info
+cost_calc = EnergyCostCalculator(
+    rate_per_kwh=0.12,      # Standard rate
+    peak_rate=0.18,          # Peak rate (optional)
+    peak_hours=(17, 21)      # Peak period 5pm-9pm (optional)
+)
+
+# Calculate costs for appliances
+costs = cost_calc.calculate_total_cost(
+    appliances=test_data['appliances'],
+    time_period='daily'  # or 'monthly', 'yearly'
+)
+
+# Generate detailed cost report with recommendations
+report = cost_calc.generate_cost_report(
+    appliances=test_data['appliances'],
+    predictions=predictions  # Optional: include prediction accuracy
+)
+print(report)
+
+# Visualize cost breakdown
+cost_calc.plot_cost_breakdown(
+    appliances=test_data['appliances'],
+    save_path='cost_breakdown.png'
+)
+```
+
+### Streaming Data Processing
+
+Process data in real-time with async support:
+
+```python
+from src.utils.streaming import (
+    DataStreamSimulator,
+    StreamingDisaggregator,
+    AsyncStreamProcessor
+)
+
+# Simulate a data stream
+stream = DataStreamSimulator(
+    data=test_data['mains'],
+    sample_rate=1.0,  # 1 sample/second
+    realtime=True
+)
+
+# Process with streaming disaggregator
+disaggregator = StreamingDisaggregator(
+    algorithm=co,
+    window_size=100,
+    update_interval=10
+)
+
+for chunk in stream.stream(chunk_size=1):
+    predictions = disaggregator.process_sample(chunk[0])
+    if predictions:
+        print(f"Predictions: {predictions}")
+
+# Or use async processor for non-blocking
+def on_prediction(predictions):
+    print(f"New predictions: {predictions}")
+
+async_proc = AsyncStreamProcessor(
+    algorithm=co,
+    callback=on_prediction
+)
+
+async_proc.start()
+
+# Add samples
+for chunk in stream.stream(chunk_size=1):
+    async_proc.add_sample(chunk[0])
+
+# Get predictions
+predictions = async_proc.get_predictions(block=True, timeout=1.0)
+
+async_proc.stop()
 ```
 
 ## Algorithms

@@ -1,0 +1,73 @@
+[project]
+name = "nilm-vata"
+version = "0.1.0"
+description = "NILM Algorithm Testing and Visualization with Real-time Disaggregation"
+readme = "README.md"
+requires-python = ">=3.9"
+license = {text = "MIT"}
+authors = [
+    {name = "NILM VATA Contributors"}
+]
+keywords = ["nilm", "energy", "disaggregation", "smart-meter", "machine-learning"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Science/Research",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+]
+
+dependencies = [
+    "numpy>=1.21.0",
+    "pandas>=1.3.0",
+    "matplotlib>=3.4.0",
+    "scikit-learn>=0.24.0",
+    "scipy>=1.7.0",
+    "hmmlearn>=0.2.7",
+    "seaborn>=0.11.0",
+    "joblib>=1.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-cov>=3.0.0",
+    "black>=22.0.0",
+    "ruff>=0.1.0",
+    "mypy>=0.990",
+]
+nilmtk = [
+    "nilmtk>=0.4.3",
+    "nilm_metadata>=0.2.4",
+]
+
+[project.scripts]
+nilm-test = "test_algorithms:main"
+nilm-demo = "demo_realtime:main"
+nilm-validate = "validate:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src"]
+
+[tool.black]
+line-length = 100
+target-version = ['py39', 'py310', 'py311']
+
+[tool.ruff]
+line-length = 100
+target-version = "py39"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "N", "W", "UP"]
+ignore = ["E501"]
+
+[tool.mypy]
+python_version = "3.9"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = false
