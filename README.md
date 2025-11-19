@@ -31,6 +31,9 @@ The framework includes:
 - ✅ Easy-to-use API
 
 ### Advanced Features
+- ✅ **Web Dashboard**: Interactive web application with live charts
+- ✅ **RESTful API**: FastAPI backend for model serving
+- ✅ **WebSocket Streaming**: Real-time disaggregation
 - ✅ **Model Persistence**: Save and load trained models
 - ✅ **Energy Cost Calculator**: Calculate costs with time-of-use pricing
 - ✅ **Benchmark Tool**: Compare algorithms with detailed reports
@@ -139,6 +142,26 @@ python validate.py
 make validate
 ```
 
+### 5. Web Dashboard (NEW!)
+
+Launch the interactive web application for training and real-time monitoring:
+
+```bash
+cd webapp/backend
+python main.py
+```
+
+Then open http://localhost:8000 in your browser.
+
+**Features:**
+- Train models through web interface
+- Real-time disaggregation with live charts
+- Model management and comparison
+- WebSocket streaming for live monitoring
+- RESTful API for integration
+
+See [webapp/README.md](webapp/README.md) for complete documentation.
+
 ## Using Make Commands
 
 The project includes a Makefile for convenience:
@@ -161,10 +184,19 @@ nilm-vata/
 │   ├── algorithms/
 │   │   ├── __init__.py
 │   │   ├── combinatorial_optimization.py  # CO algorithm
-│   │   └── fhmm.py                        # FHMM algorithm
+│   │   ├── fhmm.py                        # FHMM algorithm
+│   │   ├── baseline.py                    # Baseline algorithms
+│   │   ├── knn.py                         # k-NN algorithm
+│   │   ├── seq2seq.py                     # Deep learning (Seq2Seq)
+│   │   └── dae.py                         # Deep learning (DAE)
 │   ├── datasets/
 │   │   ├── __init__.py
-│   │   └── redd_loader.py                 # Dataset loader
+│   │   ├── redd_loader.py                 # Synthetic REDD data
+│   │   ├── real_datasets.py               # REDD, UK-DALE loaders
+│   │   ├── refit_dataset.py               # REFIT dataset
+│   │   ├── ampds_dataset.py               # AMPds dataset
+│   │   ├── eco_dataset.py                 # ECO dataset
+│   │   └── more_datasets.py               # GREEND, PLAID, etc.
 │   └── utils/
 │       ├── __init__.py
 │       ├── visualization.py               # Plotting functions
@@ -172,13 +204,26 @@ nilm-vata/
 │       ├── model_persistence.py           # Save/load models
 │       ├── energy_cost.py                 # Energy cost calculator
 │       └── streaming.py                   # Real-time streaming
+├── webapp/
+│   ├── backend/
+│   │   └── main.py                        # FastAPI application
+│   ├── frontend/
+│   │   ├── static/
+│   │   │   ├── app.js                     # Dashboard JavaScript
+│   │   │   └── style.css                  # Dashboard styling
+│   │   └── templates/
+│   │       └── index.html                 # Dashboard HTML
+│   └── README.md                          # Web app documentation
 ├── test_algorithms.py                     # Simple test script
 ├── demo_realtime.py                       # Real-time demo
 ├── benchmark.py                           # Algorithm benchmark tool
+├── showcase_algorithms.py                 # Algorithm showcase
 ├── validate.py                            # Quick validation
 ├── pyproject.toml                         # Project configuration
 ├── requirements.txt                       # Python dependencies (legacy)
 ├── Makefile                               # Convenient commands
+├── DATASETS.md                            # Dataset documentation
+├── FEATURES.md                            # Future features
 └── README.md                              # This file
 ```
 

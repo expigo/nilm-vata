@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NILM VATA - Energy Disaggregation Dashboard</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>⚡ NILM VATA Dashboard</h1>
+            <p>Non-Intrusive Load Monitoring - Real-time Energy Disaggregation</p>
+        </header>
+
+        <div class="grid">
+            <!-- Left Panel: Training & Models -->
+            <div class="panel">
+                <h2>🎯 Train New Model</h2>
+
+                <div class="form-group">
+                    <label for="algorithm-select">Algorithm</label>
+                    <select id="algorithm-select" class="input">
+                        <option value="">Loading...</option>
+                    </select>
+                    <div id="algorithm-info" class="info-box"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="dataset-select">Dataset</label>
+                    <select id="dataset-select" class="input">
+                        <option value="">Loading...</option>
+                    </select>
+                    <div id="dataset-info" class="info-box"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="building-id">Building ID</label>
+                    <input type="number" id="building-id" class="input" value="1" min="1">
+                </div>
+
+                <div class="form-group">
+                    <label for="train-ratio">Train/Test Split</label>
+                    <input type="range" id="train-ratio" class="slider" min="0.5" max="0.9" step="0.05" value="0.7">
+                    <span id="train-ratio-value">70%</span>
+                </div>
+
+                <button id="train-btn" class="btn btn-primary">
+                    🚀 Start Training
+                </button>
+
+                <div id="training-status" class="status-box" style="display: none;">
+                    <div class="progress-bar">
+                        <div id="progress-fill" class="progress-fill"></div>
+                    </div>
+                    <p id="training-message">Initializing...</p>
+                </div>
+
+                <hr>
+
+                <h2>💾 Saved Models</h2>
+                <div id="models-list" class="models-list">
+                    <p class="loading">Loading models...</p>
+                </div>
+            </div>
+
+            <!-- Right Panel: Real-time Disaggregation -->
+            <div class="panel panel-large">
+                <h2>📊 Real-time Disaggregation</h2>
+
+                <div class="controls">
+                    <div class="form-group">
+                        <label for="model-select">Select Model</label>
+                        <select id="model-select" class="input">
+                            <option value="">Select a trained model...</option>
+                        </select>
+                    </div>
+
+                    <div class="button-group">
+                        <button id="start-stream-btn" class="btn btn-success" disabled>
+                            ▶️ Start Stream
+                        </button>
+                        <button id="stop-stream-btn" class="btn btn-danger" disabled>
+                            ⏸️ Stop Stream
+                        </button>
+                    </div>
+                </div>
+
+                <div id="stream-status" class="stream-status">
+                    <span class="status-indicator" id="status-indicator">●</span>
+                    <span id="status-text">Disconnected</span>
+                </div>
+
+                <div class="chart-container">
+                    <canvas id="mains-chart"></canvas>
+                </div>
+
+                <div class="chart-container">
+                    <canvas id="appliances-chart"></canvas>
+                </div>
+
+                <div id="power-stats" class="stats-grid">
+                    <!-- Dynamic power statistics -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Statistics Panel -->
+        <div class="panel panel-full">
+            <h2>📈 System Statistics</h2>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h3>Available Algorithms</h3>
+                    <p id="stat-algorithms" class="stat-value">-</p>
+                </div>
+                <div class="stat-card">
+                    <h3>Available Datasets</h3>
+                    <p id="stat-datasets" class="stat-value">-</p>
+                </div>
+                <div class="stat-card">
+                    <h3>Trained Models</h3>
+                    <p id="stat-models" class="stat-value">-</p>
+                </div>
+                <div class="stat-card">
+                    <h3>Deep Learning</h3>
+                    <p id="stat-dl" class="stat-value">-</p>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p>NILM VATA v0.1.0 | Built with FastAPI + Chart.js</p>
+        </footer>
+    </div>
+
+    <script src="/static/app.js"></script>
+</body>
+</html>
